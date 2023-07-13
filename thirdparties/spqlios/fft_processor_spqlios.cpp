@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cmath>
 #include<cstdint>
+#include <stdio.h>
 
 #include<params.hpp>
 
@@ -18,6 +19,7 @@ int32_t rev(int32_t x, int32_t M) {
 }
 
 FFT_Processor_Spqlios::FFT_Processor_Spqlios(const int32_t N) : _2N(2 * N), N(N), Ns2(N / 2) {
+fprintf(stderr, "QQQ FFT_Processor_Spqlios N=%d\n", N);
     tables_direct = new_fft_table(N);
     tables_reverse = new_ifft_table(N);
     real_inout_direct = fft_table_get_buffer(tables_direct);
