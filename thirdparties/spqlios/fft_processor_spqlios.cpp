@@ -103,8 +103,8 @@ void FFT_Processor_Spqlios::execute_reverse_torus64(double* res, const uint64_t*
 void FFT_Processor_Spqlios::execute_direct_torus32(uint32_t *res, const double *a) {
     //TODO: parallelization
     static const double _2sN = double(2) / double(N);
-//    for (int32_t i=0; i<N; i++) real_inout_direct[i]=a[i]*_2sN;
-#if 1
+    for (int32_t i=0; i<N; i++) real_inout_direct[i]=a[i]*_2sN;
+#if 0
     {
         double *dst = real_inout_direct;
         const double *sit = a;
