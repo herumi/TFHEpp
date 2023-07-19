@@ -20,7 +20,7 @@ void test(int n)
 	FFT_Processor_Spqlios fft(n);
 	DoubleVec a(n);
 	for (int i = 0; i < n; i++) {
-		a[i] = i * 1.1;
+		a[i] = sin(0.3*i) * i * 123.4;
 	}
 	IntVec res(n);
 	fft.execute_direct_torus32(res.data(), a.data());
@@ -28,10 +28,6 @@ void test(int n)
 }
 int main()
 {
-#if 1
-	test(128);
-#else
 	test(1024);
 	test(2048);
-#endif
 }

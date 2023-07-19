@@ -12,6 +12,7 @@ extern "C"{
     void ifft_model(void *tables);
     void fft(const void *tables, double *data);
     void ifft(const void *tables, double *data);
+    void fft_avx512(const void *tables, double *data);
 }
 
 class FFT_Processor_Spqlios {
