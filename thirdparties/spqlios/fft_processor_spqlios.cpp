@@ -104,6 +104,13 @@ void FFT_Processor_Spqlios::execute_direct_torus32(uint32_t *res, const double *
     static const double _2sN = double(2) / double(N);
     for (int32_t i=0; i<N; i++) real_inout_direct[i]=a[i]*_2sN;
     fft(tables_direct, real_inout_direct);
+    alignas(64) double buf[2048*4];
+    fft_avx512(tables_direct, buf);
+    for (int i = 0; i < N; i++) {
+        if (real_inout_direct[i] != buf[i]) {
+            printf("%d %f %f\n", i, real_inout_direct[i], buf[i]);
+        }
+    }
     for (int32_t i = 0; i < N; i++) res[i] = uint32_t(int64_t(real_inout_direct[i]));
 }
 
