@@ -9,7 +9,8 @@ template<class T>
 void put(const std::vector<T>& v)
 {
 	for (size_t i = 0, n = v.size(); i < n; i++) {
-		std::cout << v[i] << ' ';
+		if ((i % 16) > 0) std::cout << ' ';
+		std::cout << v[i];
 		if ((i % 16) == 15) std::cout << '\n';
 	}
 	std::cout << '\n';
@@ -17,6 +18,7 @@ void put(const std::vector<T>& v)
 
 void test(int n)
 {
+	printf("n=%d\n", n);
 	FFT_Processor_Spqlios fft(n);
 	DoubleVec a(n);
 	for (int i = 0; i < n; i++) {
@@ -28,6 +30,7 @@ void test(int n)
 }
 int main()
 {
+	test(32);
 	test(1024);
 	test(2048);
 }
