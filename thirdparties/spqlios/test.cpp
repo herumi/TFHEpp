@@ -1,6 +1,7 @@
 #include "fft_processor_spqlios.h"
 #include <vector>
 #include <iostream>
+#include <cybozu/benchmark.hpp>
 
 typedef std::vector<double> DoubleVec;
 typedef std::vector<uint32_t> IntVec;
@@ -26,6 +27,7 @@ void test(int n)
 	}
 	IntVec res(n);
 	fft.execute_direct_torus32(res.data(), a.data());
+	CYBOZU_BENCH_C("fft", 10000, fft.execute_direct_torus32, res.data(), a.data());
 	put(res);
 }
 int main()

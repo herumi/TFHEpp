@@ -1,4 +1,5 @@
 CFLAGS=-DNDEBUG -O2 -g -I ../../include
+CFLAGS+=-I ../../../cybozulib/include
 LIB_C=fft_processor_spqlios.cpp spqlios-fft-impl-avx512.cpp
 LIB_S=spqlios-fft-avx512.s spqlios-ifft-avx512.s
 LIB=spqlios.a
