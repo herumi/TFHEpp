@@ -19,7 +19,7 @@ int32_t rev(int32_t x, int32_t M) {
 }
 
 FFT_Processor_Spqlios::FFT_Processor_Spqlios(const int32_t N) : _2N(2 * N), N(N), Ns2(N / 2) {
-fprintf(stderr, "QQQ FFT_Processor_Spqlios N=%d\n", N);
+//fprintf(stderr, "QQQ FFT_Processor_Spqlios N=%d\n", N);
     tables_direct = new_fft_table(N);
     tables_reverse = new_ifft_table(N);
     real_inout_direct = fft_table_get_buffer(tables_direct);
@@ -104,7 +104,7 @@ void FFT_Processor_Spqlios::execute_direct_torus32(uint32_t *res, const double *
     static const double _2sN = double(2) / double(N);
     for (int32_t i=0; i<N; i++) real_inout_direct[i]=a[i]*_2sN;
     fft_avx512(tables_direct, real_inout_direct);
-//    fft(tables_direct, real_inout_direct);
+//    fft(tables_direct, real_inout_direct); // QQQ
     for (int32_t i = 0; i < N; i++) res[i] = uint32_t(int64_t(real_inout_direct[i]));
 }
 
