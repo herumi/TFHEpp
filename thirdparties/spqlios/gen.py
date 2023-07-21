@@ -162,71 +162,49 @@ def gen_fft():
         (v3, r) = split_n(r, n, cstr)
         (v4, r) = split_n(r, n, cstr)
         (v5, r) = split_n(r, n, cstr)
-        (v6, r) = split_n(r, n, cstr)
-        (v7, r) = split_n(r, n, cstr)
-        un(vmovapd)(v0, ptr(a1))
-        un(vmovapd)(v1, ptr(a2))
-        un(vmovapd)(v2, ptr(a3))
-        un(vmovapd)(v3, ptr(a4))
-        un(vmovapd)(v4, ptr(cosTbl), addrOffset=simdByte*2)
-        un(vmovapd)(v5, ptr(cosTbl+simdByte), addrOffset=simdByte*2)
-        un(vmulpd)(v6, v4, v2)
-        un(vmulpd)(v7, v5, v2)
-        un(vfnmadd231pd)(v6, v5, v3)
-        un(vfmadd231pd)(v7, v4, v3)
-        un(vsubpd)(v2, v0, v6)
-        un(vsubpd)(v3, v1, v7)
-        un(vaddpd)(v0, v0, v6)
-        un(vaddpd)(v1, v1, v7)
-        un(vmovapd)(ptr(a1), v0)
-        un(vmovapd)(ptr(a2), v1)
-        un(vmovapd)(ptr(a3), v2)
-        un(vmovapd)(ptr(a4), v3)
+        un(vmovapd)(v0, ptr(a3))
+        un(vmovapd)(v1, ptr(a4))
+        un(vmovapd)(v2, ptr(cosTbl), addrOffset=simdByte*2)
+        un(vmovapd)(v3, ptr(cosTbl+simdByte), addrOffset=simdByte*2)
+        un(vmulpd)(v4, v2, v0)
+        un(vfnmadd231pd)(v4, v3, v1)
+        un(vmulpd)(v5, v3, v0)
+        un(vfmadd231pd)(v5, v2, v1)
+        un(vmovapd)(v2, ptr(a1))
+        un(vmovapd)(v3, ptr(a2))
+        un(vsubpd)(v0, v2, v4)
+        un(vmovapd)(ptr(a3), v0)
+        un(vsubpd)(v1, v3, v5)
+        un(vmovapd)(ptr(a4), v1)
+        un(vaddpd)(v2, v2, v4)
+        un(vmovapd)(ptr(a1), v2)
+        un(vaddpd)(v3, v3, v5)
+        un(vmovapd)(ptr(a2), v3)
 
       mov(a0, ptr(tables+8))
 
-      # fix hnn=4
-      block4L = Label()
-      block4_exitL = Label()
+      # hnn=4 fixed
       hnn4=4
       xor_(block, block)
       mov(rax, n_div_4)
       shr(eax, 3) # rax/=hnn4*2
 
-      test(eax, 1)
-      jz(block4L)
-
-      # odd eax
+      align(32)
+      block4L = Label()
+      L(block4L)
       lea(a1, ptr(c+block*8))
       lea(a2, ptr(pim+block*8))
       lea(a3, ptr(a1+hnn4*8))
       lea(a4, ptr(a2+hnn4*8))
+
       mov(cosTbl, a0)
 
-      f3(n, Ymm)
+      f3(1, Ymm)
 
       add(block, hnn4*2)
       dec(eax)
-      jz(block4_exitL)
-
-      align(32)
-      L(block4L)
-      n=1
-      lea(a1, ptr(c+block*8))
-      lea(a2, ptr(pim+block*8))
-      lea(a3, ptr(a1+hnn4*8))
-      lea(a4, ptr(a2+hnn4*8))
-      mov(cosTbl, a0)
-
-      f3(n, Ymm)
-
-      add(block, hnn4*2)
-      sub(eax, n)
       jnz(block4L)
 
-      L(block4_exitL)
-
-#      shl(hnn, 1)
       mov(hnn, 8)
       lea(a0, ptr(a0+hnn*8))
       cmp(hnn, n_div_4)
@@ -251,14 +229,16 @@ def gen_fft():
       mov(rax, hnn)
       shr(eax, 3)
 
-      test(eax, 1)
-      hnn_evenL = Label()
       hnn_exitL = Label()
-      jz(hnn_evenL)
+      mul4L = Label()
+      test(eax, 3)
+      jz(mul4L)
 
-      # hnn_odd
-      n=1
+      # eax<=3
       align(32)
+      mod3L = Label()
+      L(mod3L)
+      n=1
       f3(n, Zmm)
 
       add(a1, n*64)
@@ -267,15 +247,16 @@ def gen_fft():
       add(a4, n*64)
       add(cosTbl, n*128)
       sub(eax, n)
+      and_(eax, 3)
+      jnz(mod3L)
+
+      test(eax, eax)
       jz(hnn_exitL)
 
       # hnn_even
+      n=4
       align(32)
-      L(hnn_evenL)
-      n=2
-      align(32)
-      offsetL = Label()
-      L(offsetL)
+      L(mul4L)
       f3(n, Zmm)
 
       add(a1, n*64)
@@ -284,7 +265,7 @@ def gen_fft():
       add(a4, n*64)
       add(cosTbl, n*128)
       sub(eax, n)
-      jnz(offsetL)
+      jnz(mul4L)
 
       L(hnn_exitL)
 
